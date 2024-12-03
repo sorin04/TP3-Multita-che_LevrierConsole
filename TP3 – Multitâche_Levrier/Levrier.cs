@@ -8,14 +8,21 @@ namespace CourseDeLevrier
         private static Random random = new Random();
         private int numero;
         private AutoResetEvent eventArrivee;
+        private CourseDeLevrier course;
 
-        public Levrier(int numero, AutoResetEvent eventArrivee)
+        public Levrier(int numero, CourseDeLevrier course)
         {
             this.numero = numero;
-            this.eventArrivee = eventArrivee;
+            this.course = course;
+            this.eventArrivee = new AutoResetEvent(false);
         }
 
-        public void Run()
+        public int Numero
+        {
+            get { return numero; }
+        }
+
+        public void Courir()
         {
             Console.WriteLine($"Lévrier {numero} commence la course.");
 
@@ -24,15 +31,17 @@ namespace CourseDeLevrier
                 Thread.Sleep(random.Next(1, 10));
                 Console.WriteLine($"Lévrier {numero} a parcouru {i} mètres.");
 
-                if (i % 1000 == 0)
+                if (i == 100)
                 {
-                    
                     Console.WriteLine($"Lévrier {numero} est arrivé !");
+                    course.AjouterAuClassement(numero); 
+                    eventArrivee.Set();
                 }
             }
-
-            
-            eventArrivee.Set();
+        }
+        public void AttendreArrivee()
+        {
+            eventArrivee.WaitOne();
         }
     }
 }
